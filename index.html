@@ -14,6 +14,7 @@
             --text-color: #263238;
             --border-color: #cfd8dc;
             --success-color: #2e7d32;
+            --danger-color: #d32f2f;
         }
 
         * {
@@ -35,7 +36,7 @@
 
         .container {
             width: 100%;
-            max-width: 1250px;
+            max-width: 1300px;
             background: var(--card-background);
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
@@ -68,15 +69,34 @@
             font-weight: 600;
         }
 
+        /* Contenedor de metadatos principales */
         .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
             margin-bottom: 25px;
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Fila superior con 5 columnas */
+        .meta-row-top {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        /* Fila inferior centrada horizontalmente */
+        .meta-row-bottom {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .meta-row-bottom .form-group {
+            width: calc(20% - 12px); 
         }
 
         .form-group {
@@ -191,6 +211,24 @@
             background-color: #0d47a1;
         }
 
+        .btn-delete-row {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            width: 100%;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .btn-delete-row:hover {
+            background-color: #b71c1c;
+        }
    
         .summary-and-actions-wrapper {
             display: flex;
@@ -198,42 +236,66 @@
             align-items: center;
             margin: 30px auto 0 auto; 
             width: 100%;
-            max-width: 420px;
+            max-width: 460px;
         }
 
+        /* NUEVO DISEÑO: Fondo claro cálido de alto contraste que rompe con el azul */
         .summary-box {
-            background-color: #eaeff5;
-            border: 1px solid #b0bec5;
-            border-radius: 8px;
-            padding: 15px 20px;
+            background-color: #fff8e1; /* Tono crema/ámbar claro */
+            border: 1px solid #ffe082;
+            border-radius: 12px;
+            padding: 25px;
             width: 100%;
             font-size: 14px;
-            color: var(--text-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            color: #263238;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+
+        .summary-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
             margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .summary-box div {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px dashed #cfd8dc;
-        }
-
-        .summary-box div:last-child {
-            border-bottom: none;
-            margin-top: 5px;
-            padding-top: 8px;
-            font-size: 15px;
+            align-items: center;
+            padding: 6px 0;
         }
 
         .summary-box span {
-            color: var(--primary-color);
-            font-weight: 800;
+            font-weight: 700;
+            font-size: 15px;
+            color: #37474f;
         }
 
-        .summary-box .highlight-total {
-            color: var(--success-color);
+        /* Líneas divisorias internas */
+        .summary-divider {
+            border: none;
+            border-top: 1px solid #b0bec5;
+            margin: 12px 0;
+        }
+
+        /* Colores adaptados para la legibilidad sobre fondo claro */
+        .text-danger-custom {
+            color: #c62828 !important; /* Rojo oscuro para pérdidas */
+        }
+
+        .text-success-custom {
+            color: #1b5e20 !important; /* Verde oscuro para el éxito del envío total */
+            font-size: 16px;
+            font-weight: 800 !important;
+        }
+
+        .text-bold-custom {
+            font-weight: 700;
+            color: var(--primary-color) !important;
         }
 
         .actions {
@@ -270,6 +332,12 @@
             z-index: 1000;
         }
         .toast.show { opacity: 1; }
+
+        @media (max-width: 992px) {
+            .meta-row-top { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+            .meta-row-bottom { flex-wrap: wrap; }
+            .meta-row-bottom .form-group { width: auto; flex: 1 1 180px; max-width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -287,58 +355,63 @@
         </div>
 
         <div class="meta-grid">
-            <div class="form-group">
-                <label for="fecha">Fecha recepción</label>
-                <input type="date" id="fecha" required>
+            <div class="meta-row-top">
+                <div class="form-group">
+                    <label for="fecha">Fecha recepción</label>
+                    <input type="date" id="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label for="granja">Granja</label>
+                    <select id="granja" required>
+                        <option value="">Seleccione una granja</option>
+                        <option value="Acanceh">Acanceh</option>
+                        <option value="Chickxulub">Chickxulub</option>
+                        <option value="Chochola">Chochola</option>
+                        <option value="Mococha">Mococha</option>
+                        <option value="Tekit">Tekit</option>
+                        <option value="Salactun">Salactun</option> 
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modulo">Módulo</label>
+                    <select id="modulo" required>
+                        <option value="">Seleccione un módulo</option>
+                        <option value="Modulo_1">Módulo 1</option>
+                        <option value="Modulo_2">Módulo 2</option>
+                        <option value="Modulo_3">Módulo 3</option>
+                        <option value="Modulo_4">Módulo 4</option>
+                        <option value="Modulo_5">Módulo 5</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="incubadora">Incubadora</label>
+                    <select id="incubadora" required>
+                        <option value="">Seleccione una incubadora</option>
+                        <option value="Buenaventura">Buenaventura</option>
+                        <option value="Flerflor">Ferflor</option>
+                        <option value="Hoctun">Hoctun</option>
+                        <option value="Yobain">Yobain</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="remision">Número de Remisión</label>
+                    <input type="text" id="remision" placeholder="Ejem. 12000" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="granja">Granja</label>
-                <select id="granja" required>
-                    <option value="">Seleccione una granja</option>
-                    <option value="Acanceh">Acanceh</option>
-                    <option value="Chickxulub">Chickxulub</option>
-                    <option value="Chochola">Chochola</option>
-                    <option value="Mococha">Mococha</option>
-                    <option value="Tekit">Tekit</option>
-                    <option value="Salactun">Salactun</option> 
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="modulo">Módulo</label>
-                <select id="modulo" required>
-                    <option value="">Seleccione un módulo</option>
-                    <option value="Modulo_1">Módulo 1</option>
-                    <option value="Modulo_2">Módulo 2</option>
-                    <option value="Modulo_3">Módulo 3</option>
-                    <option value="Modulo_4">Módulo 4</option>
-                    <option value="Modulo_5">Módulo 5</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="incubadora">Incubadora</label>
-                <select id="incubadora" required>
-                    <option value="">Seleccione una incubadora</option>
-                    <option value="Buenaventura">Buenaventura</option>
-                    <option value="Flerflor">Ferflor</option>
-                    <option value="Hoctun">Hoctun</option>
-                    <option value="Yobain">Yobain</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="remision">Número de Remisión</label>
-                <input type="text" id="remision" placeholder="Ejem. 12000" required>
-            </div>
-            <div class="form-group">
-                <label for="pedido_traslado">No.Pedido de traslado</label>
-                <input type="text" id="pedido_traslado" placeholder="Ejem. 450-253" required>
-            </div>
-            <div class="form-group">
-                <label for="temp">Temperatura (TEMP)</label>
-                <input type="text" id="temp" placeholder="Ejem. 31°C">
-            </div>
-            <div class="form-group">
-                <label for="usuario">Nombre del encargado</label>
-                <input type="text" id="usuario" placeholder="Ingresa tu nombre" oninput="calculateTotals()">
+
+            <div class="meta-row-bottom">
+                <div class="form-group">
+                    <label for="pedido_traslado">No.Pedido de traslado</label>
+                    <input type="text" id="pedido_traslado" placeholder="Ejem. 450-253" required>
+                </div>
+                <div class="form-group">
+                    <label for="temp">Temperatura (TEMP)</label>
+                    <input type="text" id="temp" placeholder="Ejem. 31°C">
+                </div>
+                <div class="form-group">
+                    <label for="usuario">Nombre del encargado</label>
+                    <input type="text" id="usuario" placeholder="Ingresa tu nombre" oninput="calculateTotals()">
+                </div>
             </div>
         </div>
 
@@ -352,6 +425,7 @@
                         <th style="width: 160px;">Tipo Ave</th>
                         <th>Mortalidad</th>
                         <th style="width: 180px;">¿Hubo Faltantes?</th>
+                        <th style="width: 140px; text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -367,14 +441,25 @@
 
         <div class="summary-and-actions-wrapper">
             <div class="summary-box">
-                <div>Captura hecha por: <span id="lbl_capturista">-</span></div>
-                <div>Total machos recibidos: <span id="lbl_total_machos">0</span></div>
-                <div>Total hembras recibidos: <span id="lbl_total_hembras">0</span></div>
-                <div>Total Mixto recibido: <span id="lbl_total_mixto">0</span></div>
-                <div>Total Pigmentado recibido: <span id="lbl_total_pigmentando">0</span></div>
-                <div>Total mortalidad: <span id="lbl_total_mortalidad">0</span></div>
-                <div>Total de faltantes: <span id="lbl_total_faltantes">0</span></div>
-                <div>Total de aves encasetadas: <span id="lbl_total_vivas" class="highlight-total">0</span></div>
+                <h3 class="summary-title">Resumen</h3>
+                
+                <div>Captura hecha por <span id="lbl_capturista" class="text-bold-custom">-</span></div>
+                
+                <br>
+                <div>Pollito macho recibido <span id="lbl_total_machos">0</span></div>
+                <div>Pollito hembra recibido <span id="lbl_total_hembras">0</span></div>
+                <div>Pollito mixto recibido <span id="lbl_total_mixto">0</span></div>
+                <div>Pollito pigmentado recibido <span id="lbl_total_pigmentando">0</span></div>
+                
+                <hr class="summary-divider">
+                
+                <div>Total pollito encasetado <span id="lbl_total_encasetado" class="text-bold-custom">0</span></div>
+                <div>Total mortalidad <span id="lbl_total_mortalidad" class="text-danger-custom">0</span></div>
+                <div>Total de faltantes <span id="lbl_total_faltantes" class="text-danger-custom">0</span></div>
+                
+                <hr class="summary-divider">
+                
+                <div>Envío total <span id="lbl_envio_total" class="text-success-custom">0</span></div>
             </div>
 
             <div class="actions">
@@ -408,7 +493,7 @@
                 </select>
             </td>
             <td><input type="text" name="lote_${rowNum}" placeholder="Ejem. 245,256,270"></td>
-            <td><input type="number" name="aves_${rowNum}" min="0" oninput="calculateTotals()"></td>
+            <td><input type="number" name="aves_${rowNum}" min="0" oninput="calculateTotals()" required></td>
             <td>
                 <select name="tipo_${rowNum}" onchange="calculateTotals()">
                     <option value="Macho">Macho</option>
@@ -424,6 +509,9 @@
                     <input type="number" name="faltantes_${rowNum}" min="0" value="0" placeholder="Cant." disabled oninput="calculateTotals()">
                 </div>
             </td>
+            <td>
+                <button type="button" class="btn-delete-row" onclick="deleteRow(this)">Eliminar</button>
+            </td>
         `;
     }
 
@@ -431,13 +519,8 @@
         const tableBody = document.querySelector("#dataTable tbody");
         tableBody.innerHTML = "";
         totalRowsCount = 0;
-        for (let i = 1; i <= 4; i++) {
-            totalRowsCount++;
-            const row = document.createElement("tr");
-            row.className = "data-row";
-            row.innerHTML = generateRowHtml(totalRowsCount);
-            tableBody.appendChild(row);
-        }
+        
+        addNewRow();
     }
 
     function addNewRow() {
@@ -447,6 +530,19 @@
         newRow.className = "data-row";
         newRow.innerHTML = generateRowHtml(totalRowsCount);
         tableBody.appendChild(newRow);
+        calculateTotals();
+    }
+
+    function deleteRow(buttonElement) {
+        const tableBody = document.querySelector("#dataTable tbody");
+        if (tableBody.querySelectorAll("tr").length <= 1) {
+            alert("Debe mantener al menos una fila para poder realizar la captura.");
+            return;
+        }
+        
+        const row = buttonElement.closest("tr");
+        row.remove();
+        calculateTotals();
     }
 
     function toggleFaltantesField(rowNum) {
@@ -470,39 +566,45 @@
             mixto: 0,
             pigmentando: 0,
             mortalidad: 0,
-            faltantes: 0,
-            encasetadas: 0
+            faltantes: 0
         };
 
+        // Recoge el nombre directamente del input 'usuario' en tiempo real
         const capturista = document.getElementById('usuario').value.trim();
-        document.getElementById('lbl_capturista').innerText = capturista !== "" ? capturista : "-";
+        document.getElementById('lbl_capturista').innerText = capturista !== "" ? capturista : '-';
 
-        for (let i = 1; i <= totalRowsCount; i++) {
-            if (document.getElementsByName(`aves_${i}`)[0]) {
-                const aves = parseInt(document.getElementsByName(`aves_${i}`)[0].value) || 0;
-                const tipo = document.getElementsByName(`tipo_${i}`)[0].value;
-                const mortalidad = parseInt(document.getElementsByName(`mortalidad_${i}`)[0].value) || 0;
-                const faltantes = parseInt(document.getElementsByName(`faltantes_${i}`)[0].value) || 0;
+        const rows = document.querySelectorAll("#dataTable tbody tr");
+        rows.forEach(row => {
+            const casetaSelect = row.querySelector("select[name^='caseta_']");
+            if (!casetaSelect) return;
 
-                if (tipo === "Macho") totals.macho += aves;
-                else if (tipo === "Hembra") totals.hembra += aves;
-                else if (tipo === "Mixto") totals.mixto += aves;
-                else if (tipo === "Pigmentando") totals.pigmentando += aves;
+            const rowNum = casetaSelect.name.split('_')[1];
+            const aves = parseInt(row.querySelector(`input[name='aves_${rowNum}']`).value) || 0;
+            const tipo = row.querySelector(`select[name='tipo_${rowNum}']`).value;
+            const mortalidad = parseInt(row.querySelector(`input[name='mortalidad_${rowNum}']`).value) || 0;
+            const faltantes = parseInt(row.querySelector(`input[name='faltantes_${rowNum}']`).value) || 0;
 
-                totals.mortalidad += mortalidad;
-                totals.faltantes += faltantes;
-                
-                totals.encasetadas += (aves - mortalidad - faltantes);
-            }
-        }
+            if (tipo === "Macho") totals.macho += aves;
+            else if (tipo === "Hembra") totals.hembra += aves;
+            else if (tipo === "Mixto") totals.mixto += aves;
+            else if (tipo === "Pigmentando") totals.pigmentando += aves;
+
+            totals.mortalidad += mortalidad;
+            totals.faltantes += faltantes;
+        });
+
+        let totalEncasetado = totals.macho + totals.hembra + totals.mixto + totals.pigmentando;
+        let envioTotal = totalEncasetado + totals.mortalidad + totals.faltantes;
 
         document.getElementById('lbl_total_machos').innerText = totals.macho;
         document.getElementById('lbl_total_hembras').innerText = totals.hembra;
         document.getElementById('lbl_total_mixto').innerText = totals.mixto;
         document.getElementById('lbl_total_pigmentando').innerText = totals.pigmentando;
+        
+        document.getElementById('lbl_total_encasetado').innerText = totalEncasetado;
         document.getElementById('lbl_total_mortalidad').innerText = totals.mortalidad;
         document.getElementById('lbl_total_faltantes').innerText = totals.faltantes;
-        document.getElementById('lbl_total_vivas').innerText = totals.encasetadas >= 0 ? totals.encasetadas : 0;
+        document.getElementById('lbl_envio_total').innerText = envioTotal;
     }
 
     function resetForm() {
@@ -530,20 +632,23 @@
             detalles: []
         };
 
-        for (let i = 1; i <= totalRowsCount; i++) {
-            if (document.getElementsByName(`aves_${i}`)[0]) {
-                formData.detalles.push({
-                    fila_id: i,
-                    caseta: document.getElementsByName(`caseta_${i}`)[0].value,
-                    lote_origen: document.getElementsByName(`lote_${i}`)[0].value || "N/A",
-                    aves_recepcionadas: parseInt(document.getElementsByName(`aves_${i}`)[0].value) || 0,
-                    tipo_ave: document.getElementsByName(`tipo_${i}`)[0].value,
-                    mortalidad: parseInt(document.getElementsByName(`mortalidad_${i}`)[0].value) || 0,
-                    hubo_faltantes: document.getElementsByName(`chk_faltante_${i}`)[0].checked,
-                    faltantes_cant: parseInt(document.getElementsByName(`faltantes_${i}`)[0].value) || 0
-                });
-            }
-        }
+        const rows = document.querySelectorAll("#dataTable tbody tr");
+        rows.forEach(row => {
+            const casetaSelect = row.querySelector("select[name^='caseta_']");
+            if (!casetaSelect) return;
+
+            const rowNum = casetaSelect.name.split('_')[1];
+            formData.detalles.push({
+                fila_id: rowNum,
+                caseta: casetaSelect.value,
+                lote_origen: row.querySelector(`input[name='lote_${rowNum}']`).value || "N/A",
+                aves_recepcionadas: parseInt(row.querySelector(`input[name='aves_${rowNum}']`).value) || 0,
+                tipo_ave: row.querySelector(`select[name='tipo_${rowNum}']`).value,
+                mortalidad: parseInt(row.querySelector(`input[name='mortalidad_${rowNum}']`).value) || 0,
+                hubo_faltantes: row.querySelector(`input[name='chk_faltante_${rowNum}']`).checked,
+                faltantes_cant: parseInt(row.querySelector(`input[name='faltantes_${rowNum}']`).value) || 0
+            });
+        });
 
         console.log("Datos Listos para enviar a Google Sheets:", formData);
         showToast("Registro de recepción guardado correctamente.");
